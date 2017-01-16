@@ -14,10 +14,12 @@ app = Flask(__name__)
 
 @app.route('/webhook', methods=['POST'])
 def webhook():
+    print("got a request for some webhook")
     req = request.get_json(silent=True, force=True)
     if req.get("result").get("action") != "latestDailyShow":
         return {}
     response = makeWebhookResult()
+    print(response)
     r = make_response(response)
     r.headers['Content-Type'] = 'application/json'
     return r
@@ -31,7 +33,7 @@ def makeWebhookResult():
         "displayText": speech,
         "data": googleSpecs,
         # "contextOut": [],
-        "source": "apiai-weather-webhook-sample"
+        "source": "mprevdailyshow"
     }
 
 
