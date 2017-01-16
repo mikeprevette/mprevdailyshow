@@ -16,20 +16,19 @@ app = Flask(__name__)
 def webhook():
     print("got a request for some webhook")
     # req = request.get_json(silent=True, force=True)
-    response = makeWebhookResult(null)
+    nothing = "nothing"
+    response = makeWebhookResult(nothing)
     print(response)
     r = make_response(response)
     r.headers['Content-Type'] = 'application/json'
     return r
 
 
-def makeWebhookResult(null):
-    googleSpecs = 'google:{"expect_user_response": false,"is_ssml": true}'
-    speech = 'Cats in the cradle'
+def makeWebhookResult(nothing):
     return {
-        "speech": speech,
-        "displayText": speech,
-        "data": googleSpecs,
+        "speech": 'Cats in the cradle',
+        "displayText": 'Cats in the cradle',
+        "data": 'google:{"expect_user_response": false,"is_ssml": true}',
         # "contextOut": [],
         "source": "mprevdailyshow"
     }
