@@ -15,15 +15,15 @@ app = Flask(__name__)
 @app.route('/webhook', methods=['POST'])
 def webhook():
     print("got a request for some webhook")
-    req = request.get_json(silent=True, force=True)
-    response = makeWebhookResult()
+    # req = request.get_json(silent=True, force=True)
+    response = makeWebhookResult(null)
     print(response)
     r = make_response(response)
     r.headers['Content-Type'] = 'application/json'
     return r
 
 
-def makeWebhookResult():
+def makeWebhookResult(null):
     googleSpecs = 'google:{"expect_user_response": false,"is_ssml": true}'
     speech = 'Cats in the cradle'
     return {
