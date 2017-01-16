@@ -16,8 +16,6 @@ app = Flask(__name__)
 def webhook():
     print("got a request for some webhook")
     req = request.get_json(silent=True, force=True)
-    if req.get("result").get("action") != "latestDailyShow":
-        return {}
     response = makeWebhookResult()
     print(response)
     r = make_response(response)
