@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import urllib
 import json
 import os
@@ -12,25 +10,55 @@ from flask import make_response
 app = Flask(__name__)
 
 
+
 @app.route('/webhook', methods=['POST'])
 def webhook():
-    print("got a request for some webhook")
-    # req = request.get_json(silent=True, force=True)
-    nothing = "nothing"
-    response = makeWebhookResult(nothing)
-    print(response)
-    r = make_response(response)
+    req = request.get_json(silent=True, force=True)
+
+    print("Request:")
+    print(json.dumps(req, indent=4))
+    res = processRequest(req)
+
+    res = json.dumps(res, indent=4)
+    #print(res)
+    r = make_response(res)
     r.headers['Content-Type'] = 'application/json'
     return r
 
 
-def makeWebhookResult(nothing):
+def processRequest(req):
+    #print("Process Request")
+    if req.get("result").get("action") != "latestDailyShow":
+      return {}
+    baseURL = "https://api.cc.com/feeds/alexa/tdsnews/v1_0_0"
+    result = urllib.urlopen(baseURL).read()
+    data = json.loads(result)
+    #print(data)
+    res = makeWebhookResult(data)
+    return res
+
+
+
+
+def makeWebhookResult(data):
+    #print("Making Webhook Result")
+   
+    tdsURL = data.get('streamUrl')
+    if tdsURL is None:
+        return {}
+
+    speech = "<audio src='" + tdsURL + "'>The Latest Daily show</audio>"
+    #print("Response:")
+    #print(speech)
+
+    googleSpecs = 'google:{"expect_user_response": false,"is_ssml": true}'
+
     return {
-        "speech": 'Cats in the cradle',
-        "displayText": 'Cats in the cradle',
-        "data": 'google:{"expect_user_response": false,"is_ssml": true}',
+        "speech": speech,
+        "displayText": speech,
+        "data": googleSpecs,
         # "contextOut": [],
-        "source": "mprevdailyshow"
+        "source": "mprevDailyShow"
     }
 
 
@@ -39,4 +67,4 @@ if __name__ == '__main__':
 
     print "Starting app on port %d" % port
 
-    app.run(debug=True, port=port, host='0.0.0.0')
+    app.run(debug=False, port=port, host='0.0.0.0')
