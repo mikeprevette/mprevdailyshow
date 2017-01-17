@@ -50,7 +50,7 @@ def makeWebhookResult(data):
     if tdsURL is None:
         return {}
 
-    speech = "<speak>from<say-as interpret-as='date' format='yyyymmdd' detail='2'>" + tdsDate + "</say-as><audio src='" + tdsURL + "'>The Latest Daily show</audio></speak>"
+    speech = "<speak>from <say-as interpret-as='date' format='yyyymmdd' detail='2'>" + tdsDate + "</say-as><audio src='" + tdsURL + "'>The Latest Daily show</audio></speak>"
     #print("Response:")
     #print(speech)
 
