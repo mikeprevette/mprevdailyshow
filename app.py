@@ -47,7 +47,7 @@ def makeWebhookResult(data):
     if tdsURL is None:
         return {}
 
-    speech = "<audio src='" + tdsURL + "'>The Latest Daily show</audio>"
+    speech = "<speak><audio src='" + tdsURL + "'>The Latest Daily show</audio></speak>"
     #print("Response:")
     #print(speech)
 
