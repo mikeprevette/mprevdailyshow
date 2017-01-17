@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 
 
-@app.route('/webhook', methods=['POST'])
+@app.route('/tdswebhook', methods=['POST'])
 def webhook():
     req = request.get_json(silent=True, force=True)
 
