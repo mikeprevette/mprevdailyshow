@@ -10,31 +10,52 @@ from flask import make_response
 # Flask app should start in global layout
 app = Flask(__name__)
 
+#Globals 
+
+googleSpecs = 'google:{"expect_user_response": false,"is_ssml": true}'
+
 
 # REMOVE THE FOLLOWING FOR THE DAILY SHOW 
 @app.route('/subway', methods=['POST'])
 def subway():
+    postData = request.get_json(silent=True, force=True)
+    print("Request:")
+    print(json.dumps(postData, indent=4))
+    trainStatus = picktrain(postData)
+    trainStatus = json.dumps(trainStatus, indent=4)
+    x = make_response(trainStatus)
+    x.headers['Content-Type'] = 'application/json'   
+    return x
+
+def picktrain(req):
+    if req.get("result").get("action") != "checkTrainStatus":
+      return {}
+    myTrainLine = req.get("result").get("parameters").get("trainLine")
+    print(myTrainLine)
+    myLineStatus = getMTA(myTrainLine)
+    speech = "<speak>The " + myTrainLine + " train currently has " + myLineStatus + "</speak>"
+    return {
+        "speech": speech,
+        "displayText": speech,
+        "data": googleSpecs,
+        "source": "mprevSubway"
+    }
+
+
+def getMTA(myTrainLine):
     mtaURL = 'http://web.mta.info/status/serviceStatus.txt'
     result = urllib2.urlopen(mtaURL).read()
     tree = ET.ElementTree(result)
     root = tree.getroot()
     rootElement = ET.fromstring(root)
     rootStr = rootElement.tag
-
     for line in rootElement.find('subway').iter('line'):
         lineName = line.find('name').text
         lineStatus = line.find('status').text
-        if lineName == "L":
-            LlineStatus = '{"status" : "' + lineStatus + '"}' 
-            print(type(LlineStatus))
-            print(lineName, lineStatus)
-    #type(result)
-    #root = doc['service']['subway']
-
-    #service.subway.where(Line) = L
-    x = make_response(LlineStatus)
-    x.headers['Content-Type'] = 'application/json'   
-    return x
+        print(lineName, lineStatus)
+        if lineName == myTrainLine:
+            myLineStatus = lineStatus
+    return myLineStatus
 
 
 @app.route('/tdswebhook', methods=['POST'])
@@ -79,8 +100,6 @@ def makeWebhookResult(data):
     speech = "<speak>from <say-as interpret-as='date' format='yyyymmdd' detail='2'>" + tdsDate + "</say-as><audio src='" + tdsURL + "'>The Latest Daily show</audio></speak>"
     #print("Response:")
     #print(speech)
-
-    googleSpecs = 'google:{"expect_user_response": false,"is_ssml": true}'
 
     return {
         "speech": speech,
