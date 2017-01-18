@@ -25,13 +25,16 @@ def subway():
         lineName = line.find('name').text
         lineStatus = line.find('status').text
         if lineName == "L":
-            LlineStatus = lineStatus
+            LlineStatus = '{"status" : "' + lineStatus + '"}' 
+            print(type(LlineStatus))
             print(lineName, lineStatus)
     #type(result)
     #root = doc['service']['subway']
 
-    #service.subway.where(Line) = L   
-    return LlineStatus
+    #service.subway.where(Line) = L
+    x = make_response(LlineStatus)
+    x.headers['Content-Type'] = 'application/json'   
+    return x
 
 
 @app.route('/tdswebhook', methods=['POST'])
