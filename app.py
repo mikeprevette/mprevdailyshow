@@ -31,7 +31,7 @@ def picktrain(req):
     if req.get("result").get("action") != "checkTrainStatus":
       return {}
     myTrainLine = req.get("result").get("parameters").get("trainLine")
-    print(myTrainLine)
+    print("my train " + myTrainLine)
     myLineStatus = getMTA(myTrainLine)
     speech = "<speak>The " + myTrainLine + " train currently has " + myLineStatus + "</speak>"
     return {
@@ -47,15 +47,17 @@ def getMTA(myTrainLine):
     result = urllib2.urlopen(mtaURL).read()
     tree = ET.ElementTree(result)
     root = tree.getroot()
+    myLine = "null"
     rootElement = ET.fromstring(root)
     rootStr = rootElement.tag
     for line in rootElement.find('subway').iter('line'):
         lineName = line.find('name').text
         lineStatus = line.find('status').text
         print(lineName, lineStatus)
-        if lineName == myTrainLine:
-            myLineStatus = lineStatus
-    return myLineStatus
+        if myTrainLine.upper() in lineName: 
+            myLine = lineStatus
+            break
+    return myLine
 
 
 @app.route('/tdswebhook', methods=['POST'])
