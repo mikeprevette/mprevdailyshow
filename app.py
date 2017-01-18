@@ -24,6 +24,7 @@ def subway():
     trainStatus = picktrain(postData)
     trainStatus = json.dumps(trainStatus, indent=4)
     x = make_response(trainStatus)
+
     x.headers['Content-Type'] = 'application/json'   
     return x
 
@@ -31,8 +32,22 @@ def picktrain(req):
     if req.get("result").get("action") != "checkTrainStatus":
       return {}
     myTrainLine = req.get("result").get("parameters").get("trainLine")
+    if not myTrainLine:
+        return {        
+            "speech": "<speak>Sorry I didn't catch that train line, please try again</speak>",
+            "displayText": "Sorry I didn't catch that train line, please try again",
+            "data": googleSpecs,
+            "source": "mprevSubway"
+        }
     print("my train " + myTrainLine)
     myLineStatus = getMTA(myTrainLine)
+    if not myLineStatus:
+        return {       
+            "speech": "<speak>Sorry I didn't catch that train line, please try again</speak>",
+            "displayText": "Sorry I didn't catch that train line, please try again",
+            "data": googleSpecs,
+            "source": "mprevSubway"
+        }
     speech = "<speak>The " + myTrainLine + " train currently has " + myLineStatus + "</speak>"
     return {
         "speech": speech,
@@ -47,7 +62,7 @@ def getMTA(myTrainLine):
     result = urllib2.urlopen(mtaURL).read()
     tree = ET.ElementTree(result)
     root = tree.getroot()
-    myLine = "null"
+    myLine = ""
     rootElement = ET.fromstring(root)
     rootStr = rootElement.tag
     for line in rootElement.find('subway').iter('line'):
@@ -57,6 +72,8 @@ def getMTA(myTrainLine):
         if myTrainLine.upper() in lineName: 
             myLine = lineStatus
             break
+        else:
+            myLine = ""
     return myLine
 
 
