@@ -48,7 +48,7 @@ def picktrain(req):
             "data": googleSpecs,
             "source": "mprevSubway"
         }
-    speech = "<speak>The " + myTrainLine + " train currently has " + myLineStatus + "</speak>"
+    speech = "<speak>The " + myTrainLine + " train currently has " + myLineStatus.lower() + "</speak>"
     return {
         "speech": speech,
         "displayText": speech,
