@@ -1,6 +1,7 @@
-import urllib
+import urllib2
 import json
 import os
+import xml.etree.ElementTree as ET
 
 from flask import Flask
 from flask import request
@@ -9,6 +10,28 @@ from flask import make_response
 # Flask app should start in global layout
 app = Flask(__name__)
 
+
+# REMOVE THE FOLLOWING FOR THE DAILY SHOW 
+@app.route('/subway', methods=['POST'])
+def subway():
+    mtaURL = 'http://web.mta.info/status/serviceStatus.txt'
+    result = urllib2.urlopen(mtaURL).read()
+    tree = ET.ElementTree(result)
+    root = tree.getroot()
+    rootElement = ET.fromstring(root)
+    rootStr = rootElement.tag
+
+    for line in rootElement.find('subway').iter('line'):
+        lineName = line.find('name').text
+        lineStatus = line.find('status').text
+        if lineName == "L":
+            LlineStatus = lineStatus
+            print(lineName, lineStatus)
+    #type(result)
+    #root = doc['service']['subway']
+
+    #service.subway.where(Line) = L   
+    return LlineStatus
 
 
 @app.route('/tdswebhook', methods=['POST'])
@@ -31,7 +54,7 @@ def processRequest(req):
     if req.get("result").get("action") != "latestDailyShow":
       return {}
     baseURL = "https://api.cc.com/feeds/alexa/tdsnews/v1_0_0"
-    result = urllib.urlopen(baseURL).read()
+    result = urllib2.urlopen(baseURL).read()
     data = json.loads(result)
     #print(data)
     res = makeWebhookResult(data)
